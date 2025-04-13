@@ -67,7 +67,7 @@ export const LoginForm = () => {
     <div className="flex flex-col items-center space-y-6">
       <Logo />
 
-      <Button
+      {/* <Button
         onClick={handleGoogleLogin}
         variant="outline"
         fullWidth
@@ -76,13 +76,13 @@ export const LoginForm = () => {
         type="button"
       >
         Login com Google
-      </Button>
-
+      </Button> */}
+{/* 
       <div className="flex w-full items-center">
         <div className="flex-1 border-t border-gray-300"></div>
         <span className="mx-4 text-sm text-gray-500">ou</span>
         <div className="flex-1 border-t border-gray-300"></div>
-      </div>
+      </div> */}
 
       <form onSubmit={handleSubmit} className="w-full space-y-4">
         {error && (
@@ -126,12 +126,12 @@ export const LoginForm = () => {
           >
             Esqueceu a senha?
           </Link>
-          <Link
+          {/* <Link
             href="/register"
             className="text-blue-600 hover:text-blue-800"
           >
             Criar conta
-          </Link>
+          </Link> */}
         </div>
       </form>
     </div>

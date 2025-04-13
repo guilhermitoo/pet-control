@@ -11,6 +11,8 @@ export default async function HomePage() {
   // Se o usuário já estiver autenticado, redirecionar para o dashboard
   if (session) {
     redirect("/dashboard");
+  } else {
+    redirect("/login");
   }
 
   return (
