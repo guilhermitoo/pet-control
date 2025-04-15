@@ -27,11 +27,17 @@ export default async function TutoresPage() {
     nome: tutor.nome,
     email: tutor.email,
     telefone: tutor.telefone,
-    endereco: tutor.endereco || "",
+    cep: tutor.cep || "",
+    rua: tutor.rua || "",
+    numero: tutor.numero || "",
+    complemento: tutor.complemento || "",
+    bairro: tutor.bairro || "",
+    cidade: tutor.cidade || "",
+    estado: tutor.estado || "",
     createdAt: tutor.createdAt.toISOString(),
     updatedAt: tutor.updatedAt.toISOString(),
   }));
-
+  
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
