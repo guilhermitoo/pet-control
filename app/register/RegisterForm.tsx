@@ -17,7 +17,6 @@ export const RegisterForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    username: "",
     password: "",
     confirmPassword: "",
   });
@@ -51,7 +50,6 @@ export const RegisterForm = () => {
       await axios.post("/api/register", {
         name: formData.name,
         email: formData.email,
-        username: formData.username,
         password: formData.password,
       });
 
@@ -109,16 +107,6 @@ export const RegisterForm = () => {
           placeholder="Seu email"
           required
           value={formData.email}
-          onChange={handleChange}
-        />
-
-        <Input
-          label="Nome de usuário"
-          name="username"
-          type="text"
-          placeholder="Seu nome de usuário"
-          required
-          value={formData.username}
           onChange={handleChange}
         />
 

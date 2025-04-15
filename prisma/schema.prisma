@@ -13,7 +13,6 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   name          String?
-  username      String?   @unique
   email         String?   @unique
   emailVerified DateTime?
   password      String?
@@ -22,6 +21,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
+  tutores       Tutor[]
 }
 
 model Account {
@@ -57,4 +57,59 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// Novos modelos para o sistema de PetShop
+
+enum Sexo {
+  MACHO
+  FEMEA
+}
+
+model Tutor {
+  id           String       @id @default(cuid())
+  nome         String
+  email        String?
+  telefone     String
+  cep          String?
+  rua          String?
+  numero       String?
+  bairro       String?
+  cidade       String?
+  estado       String?
+  complemento  String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  petsTutores  PetTutor[]
+}
+
+model Pet {
+  id              String       @id @default(cuid())
+  nome            String
+  foto            String?
+  dataNascimento  DateTime?
+  raca            String?
+  peso            Float?
+  sexo            Sexo?
+  alergias        String?
+  observacoes     String?
+  usaTaxiDog      Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  tutores         PetTutor[]
+}
+
+model PetTutor {
+  id         String   @id @default(cuid())
+  petId      String
+  tutorId    String
+  isPrimario Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  pet        Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+  tutor      Tutor    @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+
+  @@unique([petId, tutorId])
 }

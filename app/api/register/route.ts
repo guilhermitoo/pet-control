@@ -8,9 +8,9 @@ const prisma = new PrismaClient();
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, username, password } = body;
+    const { name, email, password } = body;
 
-    if (!name || !email || !username || !password) {
+    if (!name || !email || !password) {
       return new NextResponse("Dados incompletos", { status: 400 });
     }
 
@@ -25,17 +25,6 @@ export async function POST(request: Request) {
       return new NextResponse("Email já cadastrado", { status: 400 });
     }
 
-    // Verificar se o username já existe
-    const existingUserByUsername = await prisma.user.findUnique({
-      where: {
-        username,
-      },
-    });
-
-    if (existingUserByUsername) {
-      return new NextResponse("Nome de usuário já cadastrado", { status: 400 });
-    }
-
     // Criptografar senha
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -44,7 +33,6 @@ export async function POST(request: Request) {
       data: {
         name,
         email,
-        username,
         password: hashedPassword,
       },
     });
@@ -54,7 +42,6 @@ export async function POST(request: Request) {
         id: user.id,
         name: user.name,
         email: user.email,
-        username: user.username,
       },
       { status: 201 }
     );

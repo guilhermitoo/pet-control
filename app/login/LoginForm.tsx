@@ -126,12 +126,12 @@ export const LoginForm = () => {
           >
             Esqueceu a senha?
           </Link>
-          {/* <Link
+          <Link
             href="/register"
             className="text-blue-600 hover:text-blue-800"
           >
             Criar conta
-          </Link> */}
+          </Link> 
         </div>
       </form>
     </div>

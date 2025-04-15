@@ -56,6 +56,22 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
   },
+  callbacks: {
+    // Garantir que o ID do usuário é incluído no token JWT
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    // Garantir que o ID do usuário é incluído na sessão
+    session: async ({ session, token }) => {
+      if (session?.user) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET,
 };
 
