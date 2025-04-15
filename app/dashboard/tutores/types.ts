@@ -3,7 +3,7 @@
 export interface TutorFormData {
   id?: string;
   nome: string;
-  email: string;
+  email?: string;
   telefone: string;
   cep?: string;
   rua?: string;
@@ -17,7 +17,7 @@ export interface TutorFormData {
 export interface TutorData extends TutorFormData {
   id: string;
   nome: string;
-  email: string;
+  email?: string;
   telefone: string;
   cep?: string;
   rua?: string;

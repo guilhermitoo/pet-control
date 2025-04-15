@@ -60,7 +60,8 @@ export async function PATCH(
       return new NextResponse("Não autorizado", { status: 401 });
     }
 
-    const petId = params.petId;
+    const petId = (await params).petId;
+
     const body = await request.json();
     
     const {
@@ -158,7 +159,7 @@ export async function DELETE(
       return new NextResponse("Não autorizado", { status: 401 });
     }
 
-    const petId = params.petId;
+    const petId = (await params).petId;
 
     // Verificar se o pet existe
     const existingPet = await prisma.pet.findUnique({

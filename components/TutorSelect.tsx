@@ -73,8 +73,7 @@ export const TutorSelect = ({
   const fetchTutores = async (search = "") => {
     try {
       setLoading(true);
-      // Usar a API mock enquanto o banco de dados não está configurado
-      const response = await fetch(`/api/tutores/mock?search=${search}`);
+      const response = await fetch(`/api/tutores?search=${search}`);
       if (!response.ok) {
         throw new Error('Erro ao buscar tutores');
       }
@@ -82,12 +81,7 @@ export const TutorSelect = ({
       setTutores(data);
     } catch (error) {
       console.error("Erro ao buscar tutores:", error);
-      // Em desenvolvimento, podemos usar dados fictícios
-      setTutores([
-        { id: "1", nome: "João Silva", email: "joao@example.com" },
-        { id: "2", nome: "Maria Santos", email: "maria@example.com" },
-        { id: "3", nome: "Carlos Oliveira", email: "carlos@example.com" },
-      ]);
+      setTutores([]);
     } finally {
       setLoading(false);
     }
@@ -96,34 +90,20 @@ export const TutorSelect = ({
   // Função para buscar tutores selecionados
   const fetchSelectedTutores = async () => {
     try {
-      // Aqui usamos os dados fictícios diretamente, já que é apenas para exibição
-      const mockTutores = [
-        { id: "1", nome: "João Silva", email: "joao@example.com" },
-        { id: "2", nome: "Maria Santos", email: "maria@example.com" },
-        { id: "3", nome: "Carlos Oliveira", email: "carlos@example.com" },
-        { id: "4", nome: "Ana Costa", email: "ana@example.com" },
-        { id: "5", nome: "Pedro Souza", email: "pedro@example.com" },
-      ];
+      if (value.length === 0) return;
       
-      const selected = mockTutores.filter(t => 
-        value.some(v => v.id === t.id)
-      );
+      const ids = value.map(v => v.id).join(',');
+      const response = await fetch(`/api/tutores/selected?ids=${ids}`);
       
-      setSelectedTutores(selected);
+      if (!response.ok) {
+        throw new Error('Erro ao buscar tutores selecionados');
+      }
+      
+      const data = await response.json();
+      setSelectedTutores(data);
     } catch (error) {
       console.error("Erro ao buscar tutores selecionados:", error);
-      // Manter o fallback original
-      const mockTutores = [
-        { id: "1", nome: "João Silva", email: "joao@example.com" },
-        { id: "2", nome: "Maria Santos", email: "maria@example.com" },
-        { id: "3", nome: "Carlos Oliveira", email: "carlos@example.com" },
-      ];
-      
-      const selected = mockTutores.filter(t => 
-        value.some(v => v.id === t.id)
-      );
-      
-      setSelectedTutores(selected);
+      setSelectedTutores([]);
     }
   };
 

@@ -51,11 +51,8 @@ export const TutorRow = ({ tutor, onDelete, view }: TutorRowProps) => {
   if (view === "desktop") {
     return (
       <tr className="hover:bg-gray-50">
-        <td className="whitespace-nowrap px-6 py-4">
+        <td className="whitespace-nowrap px-2 py-2">
           <div className="flex items-center">
-            <div className="h-10 w-10 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center">
-              <User className="h-5 w-5 text-blue-600" />
-            </div>
             <div className="ml-4">
               <div className="text-sm font-medium text-gray-900">{tutor.nome}</div>
             </div>
@@ -103,9 +100,6 @@ export const TutorRow = ({ tutor, onDelete, view }: TutorRowProps) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div className="flex items-center mb-3">
-        <div className="h-10 w-10 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center">
-          <User className="h-5 w-5 text-blue-600" />
-        </div>
         <div className="ml-3">
           <h3 className="text-sm font-medium text-gray-900">{tutor.nome}</h3>
         </div>

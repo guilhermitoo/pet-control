@@ -119,10 +119,6 @@ export const TutorForm = ({ initialData, isEditing }: TutorFormProps) => {
         throw new Error("Nome do tutor é obrigatório");
       }
 
-      if (!formData.email.trim()) {
-        throw new Error("Email do tutor é obrigatório");
-      }
-
       if (!formData.telefone.trim()) {
         throw new Error("Telefone do tutor é obrigatório");
       }
@@ -205,12 +201,11 @@ export const TutorForm = ({ initialData, isEditing }: TutorFormProps) => {
 
         <div>
           <Input
-            label="Email *"
+            label="Email"
             name="email"
             type="email"
             value={formData.email}
             onChange={handleChange}
-            required
             disabled={isLoading}
           />
         </div>

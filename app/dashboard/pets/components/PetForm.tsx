@@ -72,14 +72,13 @@ export const PetForm = ({ initialData, isEditing }: PetFormProps) => {
         throw new Error("Defina um tutor principal");
       }
 
-      // Usar a API mock para desenvolvimento
       if (isEditing && initialData) {
         // Atualizar pet existente
-        const response = await axios.patch(`/api/pets/mock/${initialData.id}`, formData);
+        const response = await axios.patch(`/api/pets/${initialData.id}`, formData);
         console.log('Pet atualizado:', response.data);
       } else {
         // Criar novo pet
-        const response = await axios.post("/api/pets/mock", formData);
+        const response = await axios.post("/api/pets", formData);
         console.log('Pet criado:', response.data);
       }
 
