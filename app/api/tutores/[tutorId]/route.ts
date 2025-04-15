@@ -14,7 +14,7 @@ export async function GET(
       return new NextResponse("Não autorizado", { status: 401 });
     }
 
-    const tutorId = params.tutorId;
+    const tutorId = (await params).tutorId;
 
     const tutor = await prisma.tutor.findUnique({
       where: { id: tutorId },
@@ -42,7 +42,7 @@ export async function PATCH(
       return new NextResponse("Não autorizado", { status: 401 });
     }
 
-    const tutorId = params.tutorId;
+    const tutorId = (await params).tutorId;
     const body = await request.json();
     const { 
       nome, 
@@ -110,8 +110,9 @@ export async function DELETE(
       return new NextResponse("Não autorizado", { status: 401 });
     }
 
-    const tutorId = params.tutorId;
-    
+    //const tutorId = params.tutorId;
+    const tutorId = (await params).tutorId;
+
     // Verificar se o tutor existe
     const existingTutor = await prisma.tutor.findUnique({
       where: { id: tutorId },

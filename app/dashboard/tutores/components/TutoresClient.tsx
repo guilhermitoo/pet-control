@@ -21,9 +21,8 @@ export const TutoresClient = ({ initialTutores }: TutoresClientProps) => {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      // Usamos o endpoint de mock para o desenvolvimento
-      const response = await fetch(`/api/tutores/mock?search=${searchTerm}`);
+    try {      
+      const response = await fetch(`/api/tutores?search=${searchTerm}`);
       const data = await response.json();
       setTutores(data);
     } catch (error) {

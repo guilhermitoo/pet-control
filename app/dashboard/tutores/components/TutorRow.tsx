@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Edit, MoreHorizontal, Trash, User } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 interface TutorRowProps {
   tutor: TutorData;
@@ -15,28 +16,39 @@ interface TutorRowProps {
 export const TutorRow = ({ tutor, onDelete }: TutorRowProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const router = useRouter();
 
-  const handleDelete = async () => {
-    if (!confirm(`Tem certeza que deseja excluir o tutor ${tutor.nome}?`)) {
-      return;
-    }
+  const handleDeleteClick = () => {
+    setShowConfirmation(true);
+    setIsMenuOpen(false);
+  };
 
+  const handleCancelDelete = () => {
+    setShowConfirmation(false);
+  };
+
+  const handleConfirmDelete = async () => {
     setIsLoading(true);
     try {
       // No ambiente de desenvolvimento, usamos o endpoint mock
-      await axios.delete(`/api/tutores/mock/${tutor.id}`);
+      await axios.delete(`/api/tutores/${tutor.id}`);
       onDelete(tutor.id);
     } catch (error) {
       console.error("Erro ao excluir tutor:", error);
       alert("Ocorreu um erro ao excluir o tutor. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
-      setIsMenuOpen(false);
+      setShowConfirmation(false);
     }
   };
 
+  const handleEdit = () => {
+    router.push(`/dashboard/tutores/${tutor.id}`);
+  };
+
   return (
-    <tr className="hover:bg-gray-50">
+    <tr className="hover:bg-gray-50 relative">
       <td className="whitespace-nowrap px-6 py-4">
         <div className="flex items-center">
           <div className="h-10 w-10 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center">
@@ -71,7 +83,32 @@ export const TutorRow = ({ tutor, onDelete }: TutorRowProps) => {
         </div>
       </td>
       <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-        <div className="relative">
+        <div className="flex items-center justify-end space-x-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleEdit}
+            disabled={isLoading}
+            className="!px-3 !py-1"
+          >
+            <Edit className="mr-1 h-4 w-4" />
+            Editar
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDeleteClick}
+            disabled={isLoading}
+            className="!px-3 !py-1 text-red-600 border-red-300 hover:bg-red-50"
+          >
+            <Trash className="mr-1 h-4 w-4" />
+            Excluir
+          </Button>
+        </div>
+
+        {/* Dropdown menu (opcional, mantido como alternativa) */}
+        <div className="relative hidden">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none"
@@ -91,7 +128,7 @@ export const TutorRow = ({ tutor, onDelete }: TutorRowProps) => {
                 Editar
               </Link>
               <button
-                onClick={handleDelete}
+                onClick={handleDeleteClick}
                 className="flex w-full items-center px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
                 disabled={isLoading}
               >
@@ -101,6 +138,41 @@ export const TutorRow = ({ tutor, onDelete }: TutorRowProps) => {
             </div>
           )}
         </div>
+
+        {/* Modal de confirmação */}
+        {showConfirmation && (
+          <>
+            {/* Backdrop/overlay com opacidade */}
+            <div className="fixed inset-0 z-40 bg-black opacity-50 "></div>
+            
+            {/* Conteúdo do modal */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center text-center backdrop-filter backdrop-blur-sm">
+              <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+                <h3 className="mb-4 text-lg font-medium text-gray-900">Confirmar exclusão</h3>
+                <p className="mb-6 text-sm text-gray-500 break-words">
+                  Tutor: <span className="font-semibold">{tutor.nome}</span>?<br/>
+                </p>
+                <div className="flex justify-center space-x-3">
+                  <Button
+                    variant="outline"
+                    onClick={handleCancelDelete}
+                    disabled={isLoading}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={handleConfirmDelete}
+                    isLoading={isLoading}
+                    className="!bg-red-600 hover:!bg-red-700"
+                  >
+                    Confirmar exclusão
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </td>
     </tr>
   );

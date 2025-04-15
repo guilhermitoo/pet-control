@@ -21,23 +21,14 @@ export default async function EditTutorPage({ params }: TutorPageProps) {
 
   // Tentar buscar o tutor do banco de dados
   let tutor;
+  const tutorId = (await params).tutorId;
+
   try {
     tutor = await prisma.tutor.findUnique({
-      where: { id: params.tutorId },
+      where: { id: tutorId },
     });
   } catch (error) {
     console.error("Erro ao buscar tutor:", error);
-    // Se o banco não estiver configurado, usar dados de exemplo para desenvolvimento
-    tutor = {
-      id: params.tutorId,
-      nome: "Nome do Tutor",
-      email: "email@exemplo.com",
-      telefone: "(11) 98765-4321",
-      endereco: "Rua Exemplo, 123",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: "user123"
-    };
   }
 
   if (!tutor) {
@@ -50,9 +41,15 @@ export default async function EditTutorPage({ params }: TutorPageProps) {
     nome: tutor.nome,
     email: tutor.email,
     telefone: tutor.telefone,
-    endereco: tutor.endereco || "",
+    cep: tutor.cep || "",
+    rua: tutor.rua || "",
+    numero: tutor.numero || "",
+    complemento: tutor.complemento || "",
+    bairro: tutor.bairro || "",
+    cidade: tutor.cidade || "",
+    estado: tutor.estado || ""
   };
-
+  
   return (
     <div>
       <div className="mb-6">

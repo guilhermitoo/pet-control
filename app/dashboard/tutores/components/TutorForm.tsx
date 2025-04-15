@@ -78,6 +78,36 @@ export const TutorForm = ({ initialData, isEditing }: TutorFormProps) => {
     }
   };
 
+  const formatTelefone = (telefone: string) => {
+    // Remove todos os caracteres não numéricos
+    let numero = telefone.replace(/\D/g, '');
+    
+    // Limita a quantidade de dígitos (DDD + número)
+    if (numero.length > 11) {
+      numero = numero.substring(0, 11);
+    }
+    
+    // Formata de acordo com a quantidade de dígitos
+    if (numero.length <= 2) {
+      // Somente DDD
+      return numero.length ? `(${numero}` : '';
+    } else if (numero.length <= 6) {
+      // DDD + início do número
+      return `(${numero.substring(0, 2)}) ${numero.substring(2)}`;
+    } else if (numero.length <= 10) {
+      // Formato de 8 dígitos: (XX) XXXX-XXXX
+      return `(${numero.substring(0, 2)}) ${numero.substring(2, 6)}-${numero.substring(6)}`;
+    } else {
+      // Formato de 9 dígitos: (XX) XXXXX-XXXX
+      return `(${numero.substring(0, 2)}) ${numero.substring(2, 7)}-${numero.substring(7)}`;
+    }
+  };
+
+  const handleTelefoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedTelefone = formatTelefone(e.target.value);
+    setFormData((prev) => ({ ...prev, telefone: formattedTelefone }));
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -190,10 +220,11 @@ export const TutorForm = ({ initialData, isEditing }: TutorFormProps) => {
             label="Telefone *"
             name="telefone"
             value={formData.telefone}
-            onChange={handleChange}
+            onChange={handleTelefoneChange}
             required
             disabled={isLoading}
             placeholder="(00) 00000-0000"
+            maxLength={16} // (XX) XXXXX-XXXX tem 16 caracteres
           />
         </div>
 
@@ -223,7 +254,7 @@ export const TutorForm = ({ initialData, isEditing }: TutorFormProps) => {
         <div>
           <Input
             label="Estado"
-            name="uf"
+            name="estado"
             value={formData.estado || ""}
             onChange={handleChange}
             disabled={isLoading}
