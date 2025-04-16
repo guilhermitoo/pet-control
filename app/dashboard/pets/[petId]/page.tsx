@@ -20,7 +20,7 @@ export default async function EditPetPage({ params }: PetPageProps) {
   }
 
   const pet = await prisma.pet.findUnique({
-    where: { id: params.petId },
+    where: { id: (await params).petId },
     include: {
       tutores: {
         include: {

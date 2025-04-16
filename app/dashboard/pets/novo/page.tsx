@@ -27,7 +27,7 @@ export default async function NewPetPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Cadastrar Novo Pet</h1>
         <p className="mt-2 text-gray-600">
-          Preencha os dados do pet e adicione pelo menos um tutor responsável.
+          Preencha os dados do pet.
         </p>
       </div>
 

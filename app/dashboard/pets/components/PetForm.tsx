@@ -61,16 +61,7 @@ export const PetForm = ({ initialData, isEditing }: PetFormProps) => {
       // Validações básicas
       if (!formData.nome.trim()) {
         throw new Error("Nome do pet é obrigatório");
-      }
-
-      if (formData.tutores.length === 0) {
-        throw new Error("Adicione pelo menos um tutor");
-      }
-
-      const hasPrimaryTutor = formData.tutores.some(t => t.isPrimario);
-      if (!hasPrimaryTutor) {
-        throw new Error("Defina um tutor principal");
-      }
+      }     
 
       if (isEditing && initialData) {
         // Atualizar pet existente
@@ -167,6 +158,7 @@ export const PetForm = ({ initialData, isEditing }: PetFormProps) => {
               onChange={handleChange}
               className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               disabled={isLoading}
+              required
             >
               <option value="">Selecione</option>
               <option value="MACHO">Macho</option>

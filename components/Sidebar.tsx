@@ -51,6 +51,11 @@ export const Sidebar = () => {
       href: "/dashboard",
     },
     {
+      icon: <Calendar size={20} />,
+      title: "Agendamentos",
+      href: "/dashboard/agendamentos",
+    },
+    {
       icon: <PawPrint size={20} />,
       title: "Pets",
       href: "/dashboard/pets",
@@ -61,19 +66,9 @@ export const Sidebar = () => {
       href: "/dashboard/tutores",
     },
     {
-      icon: <Calendar size={20} />,
-      title: "Agendamentos",
-      href: "/dashboard/agendamentos",
-    },
-    {
       icon: <Package size={20} />,
       title: "Produtos",
       href: "/dashboard/produtos",
-    },
-    {
-      icon: <ShoppingCart size={20} />,
-      title: "Vendas",
-      href: "/dashboard/vendas",
     },
     {
       icon: <Settings size={20} />,

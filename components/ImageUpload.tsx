@@ -44,7 +44,12 @@ export const ImageUpload = ({
       setIsLoading(true);
       
       // Versão simplificada - use o FileReader diretamente
-      const reader = new FileReader();
+      const resizedImage = await resizeAndCompressImage(file);
+
+      onChange(resizedImage);
+      setPreview(resizedImage);      
+
+/*      const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
           const imageDataUrl = event.target.result as string;
@@ -58,12 +63,15 @@ export const ImageUpload = ({
         setIsLoading(false);
         alert("Ocorreu um erro ao processar a imagem. Por favor, tente novamente.");
       };
-      reader.readAsDataURL(file);
-      
+      reader.readAsDataURL(file);*/
+
+
     } catch (error) {
       console.error("Erro ao processar a imagem:", error);
       alert("Ocorreu um erro ao processar a imagem. Por favor, tente novamente.");
       setIsLoading(false);
+    } finally {
+      setIsLoading(false)
     }
   };
 

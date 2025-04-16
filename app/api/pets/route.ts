@@ -111,25 +111,27 @@ export async function POST(request: Request) {
       return new NextResponse("Um ou mais tutores não existem", { status: 400 });
     }
 
+    let _data = {
+      nome,
+      foto,
+      dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
+      raca,
+      peso: peso ? parseFloat(peso) : null,
+      sexo: sexo as Sexo,
+      alergias,
+      observacoes,
+      usaTaxiDog: !!usaTaxiDog,
+      tutores: {
+        create: tutores.map((t: any) => ({
+          tutorId: t.id,
+          isPrimario: t.isPrimario,
+        })),
+      },
+    }
+
     // Criar o pet com seus relacionamentos
     const pet = await prisma.pet.create({
-      data: {
-        nome,
-        foto,
-        dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
-        raca,
-        peso: peso ? parseFloat(peso) : null,
-        sexo: sexo as Sexo,
-        alergias,
-        observacoes,
-        usaTaxiDog: !!usaTaxiDog,
-        tutores: {
-          create: tutores.map((t: any) => ({
-            tutorId: t.id,
-            isPrimario: t.isPrimario,
-          })),
-        },
-      },
+      data: _data
     });
 
     return NextResponse.json(pet);
