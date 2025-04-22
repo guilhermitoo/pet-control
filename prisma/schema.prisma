@@ -113,3 +113,49 @@ model PetTutor {
 
   @@unique([petId, tutorId])
 }
+
+// Enum para tipo de precificação
+enum TipoPrecificacao {
+  PESO
+  RACA
+  AMBOS
+}
+
+// Modelo de Serviço
+model Servico {
+  id              String            @id @default(cuid())
+  nome            String
+  observacoes     String?
+  tipoPrecificacao TipoPrecificacao
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  precosPorPeso   PrecoPorPeso[]
+  precosPorRaca   PrecoPorRaca[]
+}
+
+// Tabela de preços por faixa de peso
+model PrecoPorPeso {
+  id         String   @id @default(cuid())
+  servicoId  String
+  servico    Servico  @relation(fields: [servicoId], references: [id], onDelete: Cascade)
+  pesoInicial Float
+  pesoFinal   Float
+  preco       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([servicoId, pesoInicial, pesoFinal])
+}
+
+// Tabela de preços por raça
+model PrecoPorRaca {
+  id         String   @id @default(cuid())
+  servicoId  String
+  servico    Servico  @relation(fields: [servicoId], references: [id], onDelete: Cascade)
+  raca       String
+  preco      Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([servicoId, raca])
+}

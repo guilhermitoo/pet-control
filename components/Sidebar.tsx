@@ -66,6 +66,11 @@ export const Sidebar = () => {
       href: "/dashboard/tutores",
     },
     {
+      icon: <ShoppingCart size={20} />,
+      title: "Serviços",
+      href: "/dashboard/servicos",
+    },
+    {
       icon: <Package size={20} />,
       title: "Produtos",
       href: "/dashboard/produtos",
