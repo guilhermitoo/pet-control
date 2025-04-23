@@ -1,12 +1,10 @@
-// app/dashboard/servicos/components/ServicoCard.tsx
 "use client";
 
 import { Button } from "@/components/Button";
-import { ServicoData, TipoPrecificacao } from "../types";
+import { ServicoData } from "../types";
 import { useState } from "react";
 import { Edit, Trash } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import axios from "axios";
 
 interface ServicoCardProps {
@@ -17,7 +15,6 @@ interface ServicoCardProps {
 export const ServicoCard = ({ servico, onDelete }: ServicoCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const router = useRouter();
 
   const handleDeleteClick = () => {
     setShowConfirmation(true);
@@ -48,68 +45,36 @@ export const ServicoCard = ({ servico, onDelete }: ServicoCardProps) => {
     });
   };
 
-  const getTipoPrecificacaoText = (tipo: TipoPrecificacao) => {
-    switch (tipo) {
-      case TipoPrecificacao.PESO:
-        return "Por Peso";
-      case TipoPrecificacao.RACA:
-        return "Por Raça";
-      case TipoPrecificacao.AMBOS:
-        return "Por Peso e Raça";
-      default:
-        return tipo;
-    }
-  };
-
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
       <div className="p-6">
         <div className="mb-4">
           <h3 className="text-xl font-semibold text-gray-900">{servico.nome}</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {getTipoPrecificacaoText(servico.tipoPrecificacao)}
-          </p>
         </div>
 
         {servico.observacoes && (
           <p className="mb-4 text-sm text-gray-600">{servico.observacoes}</p>
         )}
 
-        {/* Tabela de preços por peso */}
-        {(servico.tipoPrecificacao === TipoPrecificacao.PESO || servico.tipoPrecificacao === TipoPrecificacao.AMBOS) && servico.precosPorPeso.length > 0 && (
-          <div className="mb-4">
-            <h4 className="mb-2 text-sm font-medium text-gray-700">Preços por Peso:</h4>
-            <div className="space-y-1">
-              {servico.precosPorPeso.map((preco) => (
-                <div key={preco.id} className="flex justify-between text-sm">
-                  <span className="text-gray-600">
-                    {preco.pesoInicial}kg até {preco.pesoFinal}kg
-                  </span>
-                  <span className="font-medium text-gray-900">
-                    {formatarPreco(preco.preco)}
-                  </span>
-                </div>
-              ))}
-            </div>
+        {/* Tabela de preços */}
+        <div className="mb-4">
+          <h4 className="mb-2 text-sm font-medium text-gray-700">Preços:</h4>
+          <div className="space-y-1">
+            {servico.precos.map((preco, index) => (
+              <div key={index} className="flex justify-between text-sm">
+                <span className="text-gray-600">
+                  {preco.raca && `${preco.raca}`}
+                  {preco.raca && preco.peso && " - "}
+                  {preco.peso && `${preco.peso}kg`}
+                  {!preco.raca && !preco.peso && "Preço base"}
+                </span>
+                <span className="font-medium text-gray-900">
+                  {formatarPreco(preco.preco)}
+                </span>
+              </div>
+            ))}
           </div>
-        )}
-
-        {/* Tabela de preços por raça */}
-        {(servico.tipoPrecificacao === TipoPrecificacao.RACA || servico.tipoPrecificacao === TipoPrecificacao.AMBOS) && servico.precosPorRaca.length > 0 && (
-          <div className="mb-4">
-            <h4 className="mb-2 text-sm font-medium text-gray-700">Preços por Raça:</h4>
-            <div className="space-y-1">
-              {servico.precosPorRaca.map((preco) => (
-                <div key={preco.id} className="flex justify-between text-sm">
-                  <span className="text-gray-600">{preco.raca}</span>
-                  <span className="font-medium text-gray-900">
-                    {formatarPreco(preco.preco)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        </div>
 
         <div className="mt-6 flex gap-2">
           <Link href={`/dashboard/servicos/${servico.id}`} className="flex-1">
@@ -129,7 +94,7 @@ export const ServicoCard = ({ servico, onDelete }: ServicoCardProps) => {
             disabled={isLoading}
             className="flex-1 text-red-600 border-red-300 hover:bg-red-50"
           >
-            <Trash size={16} className="mr-2" />
+            <Trash size={16} className="mr-1" />
             Excluir
           </Button>
         </div>

@@ -1,21 +1,9 @@
 // app/dashboard/servicos/types.ts
 
-export enum TipoPrecificacao {
-    PESO = "PESO",
-    RACA = "RACA",
-    AMBOS = "AMBOS"
-  }
-  
-  export interface PrecoPorPeso {
+export interface Preco {
     id?: string;
-    pesoInicial: number;
-    pesoFinal: number;
-    preco: number;
-  }
-  
-  export interface PrecoPorRaca {
-    id?: string;
-    raca: string;
+    raca?: string | null;
+    peso?: number | null;
     preco: number;
   }
   
@@ -23,9 +11,7 @@ export enum TipoPrecificacao {
     id?: string;
     nome: string;
     observacoes?: string;
-    tipoPrecificacao: TipoPrecificacao;
-    precosPorPeso: PrecoPorPeso[];
-    precosPorRaca: PrecoPorRaca[];
+    precos: Preco[];
   }
   
   export interface ServicoData extends ServicoFormData {

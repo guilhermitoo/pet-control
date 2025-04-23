@@ -17,8 +17,7 @@ export default async function ServicosPage() {
       nome: "asc",
     },
     include: {
-      precosPorPeso: true,
-      precosPorRaca: true,
+      precos: true,
     },
   });
 
@@ -27,9 +26,12 @@ export default async function ServicosPage() {
     id: servico.id,
     nome: servico.nome,
     observacoes: servico.observacoes || "",
-    tipoPrecificacao: servico.tipoPrecificacao,
-    precosPorPeso: servico.precosPorPeso,
-    precosPorRaca: servico.precosPorRaca,
+    precos: servico.precos.map(preco => ({
+      id: preco.id,
+      raca: preco.raca,
+      peso: preco.peso,
+      preco: preco.preco
+    })),
     createdAt: servico.createdAt.toISOString(),
     updatedAt: servico.updatedAt.toISOString(),
   }));
@@ -44,4 +46,3 @@ export default async function ServicosPage() {
     </div>
   );
 }
-

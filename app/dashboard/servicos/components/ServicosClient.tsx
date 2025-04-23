@@ -13,7 +13,7 @@ interface ServicosClientProps {
 }
 
 export const ServicosClient = ({ initialServicos }: ServicosClientProps) => {
-  const [servicos, setServicos] = useState<ServicoData[]>(initialServicos);
+  const [servicos, setServicos] = useState<ServicoData[]>(initialServicos || []);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,9 +24,15 @@ export const ServicosClient = ({ initialServicos }: ServicosClientProps) => {
     try {
       const response = await fetch(`/api/servicos?search=${searchTerm}`);
       const data = await response.json();
-      setServicos(data);
+      // Garantir que precos existe, mesmo que vazio
+      const servicosComPrecos = data.map((servico: ServicoData) => ({
+        ...servico,
+        precos: servico.precos || []
+      }));
+      setServicos(servicosComPrecos);
     } catch (error) {
       console.error("Erro ao buscar serviços:", error);
+      setServicos([]); // Em caso de erro, define como array vazio
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +86,10 @@ export const ServicosClient = ({ initialServicos }: ServicosClientProps) => {
           {servicos.map((servico) => (
             <ServicoCard
               key={servico.id}
-              servico={servico}
+              servico={{
+                ...servico,
+                precos: servico.precos || [] // Garantir que precos existe
+              }}
               onDelete={handleDeleteServico}
             />
           ))}

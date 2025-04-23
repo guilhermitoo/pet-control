@@ -121,41 +121,26 @@ enum TipoPrecificacao {
   AMBOS
 }
 
-// Modelo de Serviço
+// Modelo de Serviço atualizado
 model Servico {
-  id              String            @id @default(cuid())
-  nome            String
-  observacoes     String?
-  tipoPrecificacao TipoPrecificacao
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  precosPorPeso   PrecoPorPeso[]
-  precosPorRaca   PrecoPorRaca[]
+  id          String    @id @default(cuid())
+  nome        String
+  observacoes String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  precos      Preco[]   // Nova relação
 }
 
-// Tabela de preços por faixa de peso
-model PrecoPorPeso {
-  id         String   @id @default(cuid())
-  servicoId  String
-  servico    Servico  @relation(fields: [servicoId], references: [id], onDelete: Cascade)
-  pesoInicial Float
-  pesoFinal   Float
-  preco       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+// Novo modelo de Preço
+model Preco {
+  id        String   @id @default(cuid())
+  servicoId String
+  raca      String?  // Opcional
+  peso      Int?     // Opcional
+  preco     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  servico   Servico  @relation(fields: [servicoId], references: [id], onDelete: Cascade)
 
-  @@unique([servicoId, pesoInicial, pesoFinal])
-}
-
-// Tabela de preços por raça
-model PrecoPorRaca {
-  id         String   @id @default(cuid())
-  servicoId  String
-  servico    Servico  @relation(fields: [servicoId], references: [id], onDelete: Cascade)
-  raca       String
-  preco      Float
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@unique([servicoId, raca])
+  @@unique([servicoId, raca, peso]) // Garante que não haja duplicatas
 }

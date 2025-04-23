@@ -19,10 +19,9 @@ export default async function EditServicoPage({ params }: ServicoPageProps) {
   }
 
   const servico = await prisma.servico.findUnique({
-    where: { id: params.servicoId },
+    where: { id: (await params).servicoId },
     include: {
-      precosPorPeso: true,
-      precosPorRaca: true,
+      precos: true,
     },
   });
 
@@ -35,9 +34,12 @@ export default async function EditServicoPage({ params }: ServicoPageProps) {
     id: servico.id,
     nome: servico.nome,
     observacoes: servico.observacoes || "",
-    tipoPrecificacao: servico.tipoPrecificacao,
-    precosPorPeso: servico.precosPorPeso,
-    precosPorRaca: servico.precosPorRaca,
+    precos: servico.precos.map(preco => ({
+      id: preco.id,
+      raca: preco.raca || null,
+      peso: preco.peso || null,
+      preco: preco.preco
+    }))
   };
 
   return (
