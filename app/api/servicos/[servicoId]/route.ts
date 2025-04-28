@@ -23,8 +23,6 @@ export async function GET(
       },
     });
 
-    console.log(servico);
-
     if (!servico) {
       return new NextResponse("Serviço não encontrado", { status: 404 });
     }
