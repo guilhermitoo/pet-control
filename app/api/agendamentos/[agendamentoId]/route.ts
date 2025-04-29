@@ -100,7 +100,7 @@ export async function PATCH(
       return new NextResponse("Não autorizado", { status: 401 });
     }
 
-    const agendamentoId = params.agendamentoId;
+    const agendamentoId = (await params).agendamentoId;
     const body = await request.json();
     
     const {

@@ -11,18 +11,22 @@ export default async function AgendamentosPage() {
     redirect("/login");
   }
 
-  // Buscar agendamentos recentes (últimos 30 dias)
-  const dataInicio = new Date();
-  dataInicio.setDate(dataInicio.getDate() - 30);
+  // Por padrão, vamos buscar os agendamentos do dia atual
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
   
   const agendamentos = await prisma.agendamento.findMany({
     where: {
       data: {
-        gte: dataInicio,
+        gte: today,
+        lt: tomorrow,
       },
     },
     orderBy: {
-      data: "desc",
+      horaInicio: "asc",
     },
     include: {
       pet: {
@@ -45,7 +49,6 @@ export default async function AgendamentosPage() {
       },
       checklist: true,
     },
-    take: 30, // Limitar para evitar sobrecarga
   });
 
   // Formatar os dados para o componente cliente
@@ -74,7 +77,8 @@ export default async function AgendamentosPage() {
       statusPagamento: agendamento.statusPagamento,
       metodoPagamento: agendamento.metodoPagamento,
       valorTotal: agendamento.valorTotal,
-      transporte: agendamento.transporte,
+      transporteEntrada: agendamento.transporteEntrada,
+      transporteSaida: agendamento.transporteSaida,
       enviarNotificacao: agendamento.enviarNotificacao,
       servicos: agendamento.servicos.map((as) => ({
         id: as.servico.id,

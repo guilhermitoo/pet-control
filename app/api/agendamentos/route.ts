@@ -16,37 +16,87 @@ export async function GET(request: Request) {
     const status = searchParams.get("status");
     const dataInicio = searchParams.get("dataInicio");
     const dataFim = searchParams.get("dataFim");
+    const search = searchParams.get("search");
     
     let whereClause: any = {};
     
+    // Filtrar por pet
     if (petId) {
       whereClause.petId = petId;
     }
     
+    // Filtrar por status
     if (status) {
       whereClause.status = status;
     }
     
+    // Filtrar por data
     if (dataInicio || dataFim) {
       whereClause.data = {};
       
       if (dataInicio) {
-        whereClause.data.gte = new Date(dataInicio);
+        try {
+          const dataInicioObj = new Date(dataInicio);
+          // Verificar se a data é válida
+          if (!isNaN(dataInicioObj.getTime())) {
+            whereClause.data.gte = dataInicioObj;
+          }
+        } catch (error) {
+          console.error("Data início inválida:", dataInicio);
+          // Não adicionar o filtro se a data for inválida
+        }
       }
       
       if (dataFim) {
-        // Ajustar para o final do dia
-        const fimDoDia = new Date(dataFim);
-        fimDoDia.setHours(23, 59, 59, 999);
-        whereClause.data.lte = fimDoDia;
+        try {
+          // Ajustar para o final do dia
+          const fimDoDia = new Date(dataFim);
+          // Verificar se a data é válida
+          if (!isNaN(fimDoDia.getTime())) {
+            fimDoDia.setHours(23, 59, 59, 999);
+            whereClause.data.lte = fimDoDia;
+          }
+        } catch (error) {
+          console.error("Data fim inválida:", dataFim);
+          // Não adicionar o filtro se a data for inválida
+        }
       }
+    }
+
+    // Busca por pet ou tutor
+    if (search) {
+      whereClause.OR = [
+        {
+          pet: {
+            nome: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+        {
+          pet: {
+            tutores: {
+              some: {
+                tutor: {
+                  nome: {
+                    contains: search,
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+          },
+        },
+      ];
     }
 
     const agendamentos = await prisma.agendamento.findMany({
       where: whereClause,
-      orderBy: {
-        data: "desc",
-      },
+      orderBy: [
+        { data: "asc" },
+        { horaInicio: "asc" },
+      ],
       include: {
         pet: {
           include: {
@@ -96,7 +146,8 @@ export async function GET(request: Request) {
         statusPagamento: agendamento.statusPagamento,
         metodoPagamento: agendamento.metodoPagamento,
         valorTotal: agendamento.valorTotal,
-        transporte: agendamento.transporte,
+        transporteEntrada: agendamento.transporteEntrada,
+        transporteSaida: agendamento.transporteSaida,
         enviarNotificacao: agendamento.enviarNotificacao,
         servicos: agendamento.servicos.map((as) => ({
           id: as.servico.id,

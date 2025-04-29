@@ -19,7 +19,7 @@ export default async function EditarAgendamentoPage({ params }: AgendamentoPageP
     redirect("/login");
   }
 
-  const agendamentoId = params.agendamentoId;
+  const agendamentoId = (await params).agendamentoId;
 
   try {
     // Buscar o agendamento

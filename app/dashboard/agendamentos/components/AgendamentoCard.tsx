@@ -1,21 +1,21 @@
 "use client";
 
-import { AgendamentoData, StatusAgendamento, StatusPagamento, TransporteEntrada, TransporteSaida } from "../types";
+import { AgendamentoData, StatusAgendamento, StatusPagamento } from "../types";
 import Image from "next/image";
-import { Calendar, Check, CheckSquare, Clock, CreditCard, DollarSign, Edit, MoreHorizontal, PawPrint, Phone, Trash, Truck, User } from "lucide-react";
+import { Clock, CreditCard, DollarSign, Edit, MoreHorizontal, PawPrint, Phone, Trash, Truck, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/Button";
 import { useRouter } from "next/navigation";
-import { formatDateBR } from "@/lib/dateUtils";
 
 interface AgendamentoCardProps {
   agendamento: AgendamentoData;
   onDelete: (id: string) => void;
+  compact?: boolean;
 }
 
-export const AgendamentoCard = ({ agendamento, onDelete }: AgendamentoCardProps) => {
+export const AgendamentoCard = ({ agendamento, onDelete, compact = false }: AgendamentoCardProps) => {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -105,8 +105,7 @@ export const AgendamentoCard = ({ agendamento, onDelete }: AgendamentoCardProps)
     }
   };
 
-  // Formatar data e hora
-  const formattedDate = formatDateBR(agendamento.data.split('T')[0]);
+  // Formatar hora
   const formattedTimeStart = agendamento.horaInicio.split('T')[1].substring(0, 5);
   const formattedTimeEnd = agendamento.horaFim 
     ? agendamento.horaFim.split('T')[1].substring(0, 5)
@@ -160,29 +159,189 @@ export const AgendamentoCard = ({ agendamento, onDelete }: AgendamentoCardProps)
     currency: 'BRL'
   });
 
-  // Formatar método de transporte
-  const getTransporteEntradaText = () => {
-    switch (agendamento.transporteEntrada) {
-      case "DONO_TRAZ":
-        return "Dono traz";
-      case "TAXI_DOG":
-        return "Taxi Dog (buscar)";
-      default:
-        return agendamento.transporteEntrada;
-    }
-  };
+  // Versão compacta do card
+  if (compact) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm transition hover:shadow-md">
+        {/* Ações do agendamento */}
+        <div className="absolute right-2 top-2 z-10">
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="rounded-full bg-white p-1 shadow-sm hover:bg-gray-100"
+            disabled={isLoading}
+          >
+            <MoreHorizontal size={16} className="text-gray-500" />
+          </button>
 
-  const getTransporteSaidaText = () => {
-    switch (agendamento.transporteSaida) {
-      case "DONO_BUSCA":
-        return "Dono busca";
-      case "TAXI_DOG":
-        return "Taxi Dog (levar)";
-      default:
-        return agendamento.transporteSaida;
-    }
-  };
+          {isMenuOpen && (
+            <div className="absolute right-0 mt-1 w-48 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+              <button
+                onClick={handleEdit}
+                className="flex w-full items-center px-4 py-2 text-left text-xs text-gray-700 hover:bg-gray-100"
+                disabled={isLoading}
+              >
+                <Edit size={14} className="mr-2" />
+                Editar
+              </button>
+              
+              {agendamento.status === "AGENDADO" && (
+                <button
+                  onClick={handleIniciar}
+                  className="flex w-full items-center px-4 py-2 text-left text-xs text-blue-600 hover:bg-blue-50"
+                  disabled={isLoading}
+                >
+                  <Clock size={14} className="mr-2" />
+                  Iniciar
+                </button>
+              )}
+              
+              {agendamento.status === "EM_ANDAMENTO" && (
+                <button
+                  onClick={handleConcluir}
+                  className="flex w-full items-center px-4 py-2 text-left text-xs text-green-600 hover:bg-green-50"
+                  disabled={isLoading}
+                >
+                  <Edit size={14} className="mr-2" />
+                  Concluir
+                </button>
+              )}
+              
+              {agendamento.statusPagamento === "PENDENTE" && (
+                <button
+                  onClick={handlePagar}
+                  className="flex w-full items-center px-4 py-2 text-left text-xs text-green-600 hover:bg-green-50"
+                  disabled={isLoading}
+                >
+                  <DollarSign size={14} className="mr-2" />
+                  Pagar
+                </button>
+              )}
+              
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="flex w-full items-center px-4 py-2 text-left text-xs text-red-600 hover:bg-red-50"
+                disabled={isLoading}
+              >
+                <Trash size={14} className="mr-2" />
+                Excluir
+              </button>
+            </div>
+          )}
+        </div>
 
+        {/* Conteúdo principal */}
+        <div className="p-3">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-200 mr-2">
+                {agendamento.pet.foto ? (
+                  <Image
+                    src={agendamento.pet.foto}
+                    alt={agendamento.pet.nome}
+                    width={32}
+                    height={32}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <PawPrint size={16} className="text-gray-400" />
+                  </div>
+                )}
+              </div>
+              <div>
+                <h3 className="text-sm font-bold">{agendamento.pet.nome}</h3>
+                <p className="text-xs text-gray-500">
+                  {agendamento.pet.tutorPrincipal?.nome}
+                </p>
+              </div>
+            </div>
+            
+            <div className="text-right">
+              <div className="flex flex-col items-end">
+                <span className="text-sm font-bold">{formattedTimeStart}</span>
+                <span className="text-xs text-gray-500">{formattedValue}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Status badges */}
+          <div className="flex gap-1 mt-2">
+            <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusClass()}`}>
+              {getStatusText()}
+            </span>
+            <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getPagamentoClass()}`}>
+              {getPagamentoText()}
+            </span>
+          </div>
+
+          {/* Botões de ação */}
+          <div className="mt-3 flex gap-2">
+            <Link href={`/dashboard/agendamentos/${agendamento.id}`} className="flex-1">
+              <Button
+                variant="outline"
+                className="w-full px-2 py-1 h-8 text-xs"
+                disabled={isLoading}
+              >
+                Detalhes
+              </Button>
+            </Link>
+            
+            {agendamento.status === "AGENDADO" && (
+              <Button
+                onClick={handleIniciar}
+                className="flex-1 px-2 py-1 h-8 text-xs"
+                disabled={isLoading}
+              >
+                Iniciar
+              </Button>
+            )}
+            
+            {agendamento.status === "EM_ANDAMENTO" && (
+              <Button
+                onClick={handleConcluir}
+                className="flex-1 px-2 py-1 h-8 text-xs bg-green-600 hover:bg-green-700"
+                disabled={isLoading}
+              >
+                Concluir
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Modal de confirmação de exclusão */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="w-full max-w-md rounded-lg bg-white p-6">
+              <h3 className="mb-4 text-lg font-medium">Confirmar exclusão</h3>
+              <p className="mb-6">
+                Tem certeza que deseja excluir o agendamento para o pet{" "}
+                <strong>{agendamento.pet.nome}</strong>?
+              </p>
+              <div className="flex justify-end space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isLoading}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleDelete}
+                  isLoading={isLoading}
+                  className="!bg-red-600 hover:!bg-red-700"
+                >
+                  Excluir
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Versão original do card (não compacta)
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition hover:shadow-md">
       {/* Ações do agendamento */}
@@ -223,7 +382,7 @@ export const AgendamentoCard = ({ agendamento, onDelete }: AgendamentoCardProps)
                 className="flex w-full items-center px-4 py-2 text-left text-sm text-green-600 hover:bg-green-50"
                 disabled={isLoading}
               >
-                <Check size={16} className="mr-2" />
+                <Edit size={16} className="mr-2" />
                 Concluir Atendimento
               </button>
             )}
@@ -279,10 +438,7 @@ export const AgendamentoCard = ({ agendamento, onDelete }: AgendamentoCardProps)
         
         {/* Status badges */}
         <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
-          <span className={`rounded-full px-2 py-1 text-xs font-medium ${getStatusClass()}`}>
-            {getStatusText()}
-          </span>
-          <span className={`rounded-full px-2 py-1 text-xs font-medium ${getPagamentoClass()}`}>
+                        <span className={`rounded-full px-2 py-1 text-xs font-medium ${getPagamentoClass()}`}>
             {getPagamentoText()}
           </span>
         </div>
@@ -310,11 +466,6 @@ export const AgendamentoCard = ({ agendamento, onDelete }: AgendamentoCardProps)
 
         <div className="space-y-2 border-t border-gray-100 pt-3">
           <div className="flex items-center gap-2 text-sm">
-            <Calendar size={16} className="text-gray-400" />
-            <span>{formattedDate}</span>
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm">
             <Clock size={16} className="text-gray-400" />
             <span>
               {formattedTimeStart}
@@ -325,8 +476,8 @@ export const AgendamentoCard = ({ agendamento, onDelete }: AgendamentoCardProps)
           <div className="flex items-center gap-2 text-sm">
             <Truck size={16} className="text-gray-400" />
             <div className="flex flex-col">
-              <span className="text-xs text-gray-500">Entrada: {getTransporteEntradaText()}</span>
-              <span className="text-xs text-gray-500">Saída: {getTransporteSaidaText()}</span>
+              <span className="text-xs text-gray-500">Entrada: {agendamento.transporteEntrada}</span>
+              <span className="text-xs text-gray-500">Saída: {agendamento.transporteSaida}</span>
             </div>
           </div>
           
@@ -388,7 +539,7 @@ export const AgendamentoCard = ({ agendamento, onDelete }: AgendamentoCardProps)
               disabled={true}
               className="w-full"
             >
-              <Check size={16} className="mr-1" />
+              <CreditCard size={16} className="mr-1" />
               Notificado
             </Button>
           )}
@@ -402,8 +553,7 @@ export const AgendamentoCard = ({ agendamento, onDelete }: AgendamentoCardProps)
             <h3 className="mb-4 text-lg font-medium">Confirmar exclusão</h3>
             <p className="mb-6">
               Tem certeza que deseja excluir o agendamento para o pet{" "}
-              <strong>{agendamento.pet.nome}</strong> em{" "}
-              <strong>{formattedDate}</strong>?
+              <strong>{agendamento.pet.nome}</strong>?
             </p>
             <div className="flex justify-end space-x-2">
               <Button
