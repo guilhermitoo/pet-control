@@ -40,6 +40,11 @@ export const AgendamentoCard = ({ agendamento, onDelete, compact = false }: Agen
       setIsLoading(false);
     }
   };
+  
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+    setIsMenuOpen(false);
+  };
 
   const handleConcluir = async () => {
     setIsLoading(true);
@@ -159,6 +164,55 @@ export const AgendamentoCard = ({ agendamento, onDelete, compact = false }: Agen
     currency: 'BRL'
   });
 
+  // Função para renderizar o modal de confirmação de exclusão
+  const renderDeleteConfirmationModal = () => {
+    if (!showDeleteConfirm) return null;
+    
+    return (
+      <>
+        {/* Overlay/backdrop com efeito de blur */}
+        <div className="fixed inset-0 z-40 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        
+        {/* Modal */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <div className="mb-2 flex items-center text-red-600">
+              <Trash size={24} className="mr-2" />
+              <h3 className="text-lg font-medium">Confirmar exclusão</h3>
+            </div>
+            
+            <p className="mb-6 text-gray-700">
+              Tem certeza que deseja excluir o agendamento para o pet{" "}
+              <strong>{agendamento.pet.nome}</strong>?
+              <br />
+              <span className="mt-2 block text-sm text-gray-500">
+                Esta ação não pode ser desfeita.
+              </span>
+            </p>
+            
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isLoading}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleDelete}
+                isLoading={isLoading}
+                className="!bg-red-600 hover:!bg-red-700"
+              >
+                Confirmar exclusão
+              </Button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  };
+
   // Versão compacta do card
   if (compact) {
     return (
@@ -218,7 +272,7 @@ export const AgendamentoCard = ({ agendamento, onDelete, compact = false }: Agen
               )}
               
               <button
-                onClick={() => setShowDeleteConfirm(true)}
+                onClick={handleDeleteClick}
                 className="flex w-full items-center px-4 py-2 text-left text-xs text-red-600 hover:bg-red-50"
                 disabled={isLoading}
               >
@@ -275,7 +329,7 @@ export const AgendamentoCard = ({ agendamento, onDelete, compact = false }: Agen
           </div>
 
           {/* Botões de ação */}
-          <div className="mt-3 flex gap-2">
+          <div className="mt-3 flex items-center gap-2">
             <Link href={`/dashboard/agendamentos/${agendamento.id}`} className="flex-1">
               <Button
                 variant="outline"
@@ -305,38 +359,21 @@ export const AgendamentoCard = ({ agendamento, onDelete, compact = false }: Agen
                 Concluir
               </Button>
             )}
+            
+            {/* Botão de excluir (apenas ícone) */}
+            <Button
+              variant="outline"
+              onClick={handleDeleteClick}
+              disabled={isLoading}
+              className="border-red-300 text-red-600 hover:bg-red-50 px-2 min-w-8 h-8"
+            >
+              <Trash size={14} />
+            </Button>
           </div>
         </div>
 
         {/* Modal de confirmação de exclusão */}
-        {showDeleteConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="w-full max-w-md rounded-lg bg-white p-6">
-              <h3 className="mb-4 text-lg font-medium">Confirmar exclusão</h3>
-              <p className="mb-6">
-                Tem certeza que deseja excluir o agendamento para o pet{" "}
-                <strong>{agendamento.pet.nome}</strong>?
-              </p>
-              <div className="flex justify-end space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDeleteConfirm(false)}
-                  disabled={isLoading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={handleDelete}
-                  isLoading={isLoading}
-                  className="!bg-red-600 hover:!bg-red-700"
-                >
-                  Excluir
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        {renderDeleteConfirmationModal()}
       </div>
     );
   }
@@ -410,7 +447,7 @@ export const AgendamentoCard = ({ agendamento, onDelete, compact = false }: Agen
             )}
             
             <button
-              onClick={() => setShowDeleteConfirm(true)}
+              onClick={handleDeleteClick}
               className="flex w-full items-center px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
               disabled={isLoading}
             >
@@ -438,7 +475,7 @@ export const AgendamentoCard = ({ agendamento, onDelete, compact = false }: Agen
         
         {/* Status badges */}
         <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
-                        <span className={`rounded-full px-2 py-1 text-xs font-medium ${getPagamentoClass()}`}>
+          <span className={`rounded-full px-2 py-1 text-xs font-medium ${getPagamentoClass()}`}>
             {getPagamentoText()}
           </span>
         </div>
@@ -490,8 +527,8 @@ export const AgendamentoCard = ({ agendamento, onDelete, compact = false }: Agen
         </div>
 
         {/* Botões de ação */}
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <Link href={`/dashboard/agendamentos/${agendamento.id}`}>
+        <div className="mt-4 flex items-center gap-2">
+          <Link href={`/dashboard/agendamentos/${agendamento.id}`} className="flex-1">
             <Button
               variant="outline"
               className="w-full"
@@ -501,80 +538,65 @@ export const AgendamentoCard = ({ agendamento, onDelete, compact = false }: Agen
             </Button>
           </Link>
           
-          {agendamento.status === "AGENDADO" && (
-            <Button
-              onClick={handleIniciar}
-              className="w-full"
-              disabled={isLoading}
-            >
-              Iniciar
-            </Button>
-          )}
-          
-          {agendamento.status === "EM_ANDAMENTO" && (
-            <Button
-              onClick={handleConcluir}
-              className="w-full bg-green-600 hover:bg-green-700"
-              disabled={isLoading}
-            >
-              Concluir
-            </Button>
-          )}
-          
-          {agendamento.status === "CONCLUIDO" && !agendamento.enviarNotificacao && agendamento.pet.tutorPrincipal?.telefone && (
-            <Button
-              onClick={handleNotificarWhatsApp}
-              className="w-full"
-              disabled={isLoading || isNotificando}
-              isLoading={isNotificando}
-            >
-              <Phone size={16} className="mr-1" />
-              Notificar
-            </Button>
-          )}
-          
-          {agendamento.status === "CONCLUIDO" && agendamento.enviarNotificacao && (
-            <Button
-              variant="secondary"
-              disabled={true}
-              className="w-full"
-            >
-              <CreditCard size={16} className="mr-1" />
-              Notificado
-            </Button>
-          )}
+          <div className="flex-1 flex justify-center">
+            {agendamento.status === "AGENDADO" && (
+              <Button
+                onClick={handleIniciar}
+                className="w-full"
+                disabled={isLoading}
+              >
+                Iniciar
+              </Button>
+            )}
+            
+            {agendamento.status === "EM_ANDAMENTO" && (
+              <Button
+                onClick={handleConcluir}
+                className="w-full bg-green-600 hover:bg-green-700"
+                disabled={isLoading}
+              >
+                Concluir
+              </Button>
+            )}
+            
+            {agendamento.status === "CONCLUIDO" && !agendamento.enviarNotificacao && agendamento.pet.tutorPrincipal?.telefone && (
+              <Button
+                onClick={handleNotificarWhatsApp}
+                className="w-full"
+                disabled={isLoading || isNotificando}
+                isLoading={isNotificando}
+              >
+                <Phone size={16} className="mr-1" />
+                Notificar
+              </Button>
+            )}
+            
+            {agendamento.status === "CONCLUIDO" && agendamento.enviarNotificacao && (
+              <Button
+                variant="secondary"
+                disabled={true}
+                className="w-full"
+              >
+                <CreditCard size={16} className="mr-1" />
+                Notificado
+              </Button>
+            )}
+          </div>
+
+          {/* Botão de excluir (apenas ícone) */}
+          <Button
+            variant="outline"
+            onClick={handleDeleteClick}
+            disabled={isLoading}
+            className="border-red-300 text-red-600 hover:bg-red-50 px-3 min-w-10 h-10"
+          >
+            <Trash size={16} />
+          </Button>
         </div>
       </div>
 
       {/* Modal de confirmação de exclusão */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-full max-w-md rounded-lg bg-white p-6">
-            <h3 className="mb-4 text-lg font-medium">Confirmar exclusão</h3>
-            <p className="mb-6">
-              Tem certeza que deseja excluir o agendamento para o pet{" "}
-              <strong>{agendamento.pet.nome}</strong>?
-            </p>
-            <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={isLoading}
-              >
-                Cancelar
-              </Button>
-              <Button
-                variant="primary"
-                onClick={handleDelete}
-                isLoading={isLoading}
-                className="!bg-red-600 hover:!bg-red-700"
-              >
-                Excluir
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {renderDeleteConfirmationModal()}
     </div>
   );
 };

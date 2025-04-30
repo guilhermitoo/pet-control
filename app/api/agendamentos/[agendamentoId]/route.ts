@@ -219,7 +219,7 @@ export async function DELETE(
       return new NextResponse("Não autorizado", { status: 401 });
     }
 
-    const agendamentoId = params.agendamentoId;
+    const agendamentoId = (await params).agendamentoId;
 
     // Verificar se o agendamento existe
     const existingAgendamento = await prisma.agendamento.findUnique({
