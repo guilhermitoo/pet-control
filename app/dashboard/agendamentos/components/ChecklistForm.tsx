@@ -43,7 +43,7 @@ export const ChecklistForm = ({ agendamentoId, initialData, petNome }: Checklist
       
       // Esperar um pouco para mostrar a mensagem de sucesso antes de redirecionar
       setTimeout(() => {
-        router.push(`/dashboard/agendamentos/${agendamentoId}`);
+        router.push(`/dashboard/agendamentos`);
         router.refresh();
       }, 2000);
     } catch (error) {

@@ -81,6 +81,20 @@ export const AgendamentosClient = ({ initialAgendamentos }: AgendamentosClientPr
     nextDay.setDate(nextDay.getDate() + 1);
     setSelectedDate(nextDay);
   };
+  
+  // Função para atualizar um agendamento na lista
+  const handleUpdateAgendamento = (updatedAgendamento: AgendamentoData) => {
+    // Atualizar o agendamento na lista principal
+    setAgendamentos(prevAgendamentos => 
+      prevAgendamentos.map(agendamento => 
+        agendamento.id === updatedAgendamento.id 
+          ? updatedAgendamento 
+          : agendamento
+      )
+    );
+    
+    // Note: filtered agendamentos will be updated automatically in the useEffect
+  };
 
   // Ir para hoje
   const goToToday = () => {
@@ -162,7 +176,7 @@ export const AgendamentosClient = ({ initialAgendamentos }: AgendamentosClientPr
     });
 
     setFilteredAgendamentos(sortedByTime);
-  }, [agendamentos]);
+  }, [agendamentos, selectedDate]);
 
   // Efeito para buscar agendamentos ao mudar a data
   useEffect(() => {
@@ -334,6 +348,7 @@ export const AgendamentosClient = ({ initialAgendamentos }: AgendamentosClientPr
               key={agendamento.id}
               agendamento={agendamento}
               onDelete={handleDeleteAgendamento}
+              onUpdate={handleUpdateAgendamento}
               compact={true}
             />
           ))}

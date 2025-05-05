@@ -2,6 +2,7 @@
 import { getAuthSession } from "@/app/auth";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { parseISO, zonedTimeToUtc } from 'date-fns-tz';
 
 // GET para buscar um agendamento específico
 export async function GET(
